@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>江湖論劍 — 武俠卡牌對戰</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f5f4f0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem}
+#game{width:100%;max-width:680px;background:#f0efe9;border-radius:16px;overflow:hidden}
+.screen{padding:1.25rem}
+#scr-start{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:2rem 1.5rem}
+.big-title{font-size:34px;font-weight:500;letter-spacing:8px;color:#2c2c2a}
+.sub-title{font-size:13px;color:#5f5e5a;letter-spacing:3px}
+.sect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.sect-btn{border:0.5px solid rgba(0,0,0,0.2);background:#fff;border-radius:12px;padding:0.75rem;cursor:pointer;transition:all .15s;text-align:left}
+.sect-btn:hover{border-color:#888780;background:#f1efe8}
+.sect-btn.sel{border:2px solid #888780;background:#f1efe8}
+.sect-icon{font-size:18px;margin-bottom:4px}
+.sect-nm{font-size:14px;font-weight:500;color:#2c2c2a}
+.sect-fl{font-size:11px;color:#5f5e5a;margin-top:2px}
+.sect-stat{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.spill{font-size:10px;padding:2px 6px;border-radius:99px;border:0.5px solid rgba(0,0,0,0.15);color:#5f5e5a;background:#f1efe8}
+.go-btn{background:#fff;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 28px;font-size:14px;cursor:pointer;color:#2c2c2a;letter-spacing:2px;transition:all .15s}
+.go-btn:hover{background:#f1efe8}
+#scr-game{display:none;flex-direction:column;gap:10px}
+.top-bar{display:flex;justify-content:space-between;align-items:center}
+.round-lbl{font-size:13px;font-weight:500;color:#2c2c2a}
+.tabs{display:flex;gap:4px}
+.tab-btn{font-size:12px;padding:4px 10px;border-radius:8px;border:0.5px solid rgba(0,0,0,0.2);background:#fff;cursor:pointer;color:#5f5e5a;transition:all .15s}
+.tab-btn.active{background:#f1efe8;color:#2c2c2a;border-color:#888780}
+.hp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hp-block{background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:8px;padding:8px 12px}
+.hp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.hp-nm{font-size:12px;color:#5f5e5a}
+.hp-val{font-size:12px;color:#5f5e5a}
+.hpbar{height:6px;border-radius:3px;background:rgba(0,0,0,0.1);overflow:hidden;margin-bottom:4px}
+.hpbar-fill{height:100%;border-radius:3px;transition:width .4s}
+.hpf-p{background:#1D9E75}.hpf-e{background:#D85A30}
+.stat-row{display:flex;gap:4px;flex-wrap:wrap}
+.st-p{font-size:10px;padding:1px 6px;border-radius:99px;border:0.5px solid rgba(0,0,0,0.12);color:#5f5e5a;background:#f1efe8}
+.buff-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;min-height:18px}
+.bt{font-size:10px;padding:1px 6px;border-radius:99px}
+.bt-atk{background:#FAECE7;color:#993C1D;border:0.5px solid #F0997B}
+.bt-def{background:#E6F1FB;color:#185FA5;border:0.5px solid #85B7EB}
+.bt-dot{background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27}
+.bt-heal{background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459}
+.bt-stun{background:#EEEDFE;color:#3C3489;border:0.5px solid #AFA9EC}
+.bt-lifeSteal{background:#FBEAF0;color:#72243E;border:0.5px solid #ED93B1}
+.bt-weakAtk{background:#F1EFE8;color:#5F5E5A;border:0.5px solid #B4B2A9}
+.log-box{background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:8px;padding:8px 12px;font-size:12px;color:#5f5e5a;max-height:72px;overflow-y:auto;line-height:1.6}
+.log-box p{margin:0}
+.panel{background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:12px;padding:0.75rem}
+.panel-lbl{font-size:12px;color:#5f5e5a;margin-bottom:6px;letter-spacing:1px}
+.cards-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.card{border:0.5px solid rgba(0,0,0,0.12);background:#f1efe8;border-radius:8px;padding:8px;cursor:pointer;min-width:100px;max-width:112px;flex-shrink:0;transition:all .15s}
+.card:hover:not(.dis){border-color:#888780;transform:translateY(-2px)}
+.card.dis{opacity:.4;cursor:default}
+.card-ty{font-size:9px;color:#888780;letter-spacing:1px;margin-bottom:2px}
+.card-nm{font-size:12px;font-weight:500;color:#2c2c2a;margin-bottom:2px}
+.card-ds{font-size:10px;color:#5f5e5a;line-height:1.4;margin-bottom:4px}
+.card-co{font-size:10px;color:#185FA5}
+.equip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.eq-slot{border:0.5px solid rgba(0,0,0,0.12);background:#f1efe8;border-radius:8px;padding:8px;cursor:pointer;transition:all .15s}
+.eq-slot:hover{border-color:#888780}
+.eq-slot.equipped{border:1.5px solid #1D9E75;background:#e1f5ee}
+.eq-slot.equipped .eq-nm{color:#0F6E56}
+.eq-ty{font-size:9px;color:#888780;letter-spacing:1px;margin-bottom:2px}
+.eq-nm{font-size:12px;font-weight:500;color:#2c2c2a;margin-bottom:2px}
+.eq-ds{font-size:10px;color:#5f5e5a;line-height:1.4}
+.eq-head{display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.eq-rarity{font-size:9px;padding:1px 5px;border-radius:99px}
+.rare-n{background:#F1EFE8;color:#5F5E5A;border:0.5px solid #B4B2A9}
+.rare-r{background:#E6F1FB;color:#185FA5;border:0.5px solid #85B7EB}
+.rare-e{background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27}
+.rare-l{background:#FBEAF0;color:#993556;border:0.5px solid #ED93B1}
+.energy-bar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.e-dot{width:9px;height:9px;border-radius:50%;background:#B4B2A9;display:inline-block}
+.e-dot.on{background:#378ADD}
+.end-btn{margin-left:auto;background:#fff;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;padding:5px 14px;font-size:12px;cursor:pointer;color:#2c2c2a;transition:all .15s}
+.end-btn:hover{background:#f1efe8}
+#scr-over{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:1rem;padding:2rem;text-align:center}
+.over-t{font-size:26px;font-weight:500;letter-spacing:4px}
+.over-s{font-size:13px;color:#5f5e5a}
+</style>
+</head>
+<body>
+<div id="game">
+<div id="scr-start" class="screen">
+  <div class="big-title">江湖論劍</div>
+  <div class="sub-title">武俠卡牌對戰 RPG</div>
+  <p style="font-size:13px;color:#5f5e5a;max-width:360px;text-align:center;line-height:1.7">選擇你的門派，以獨門武學對抗江湖強敵。<br>切換「裝備」頁籤裝備神兵利器，以智謀取勝。</p>
+  <div style="font-size:13px;color:#5f5e5a;">選擇門派</div>
+  <div class="sect-grid" id="sect-grid"></div>
+  <button class="go-btn" onclick="startGame()">踏入江湖</button>
+</div>
+<div id="scr-game" class="screen">
+  <div class="top-bar">
+    <span class="round-lbl" id="round-lbl">第 1 回合</span>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('battle')" id="tab-battle">戰鬥</button>
+      <button class="tab-btn" onclick="showTab('equip')" id="tab-equip">裝備</button>
+    </div>
+    <span id="enemy-lbl" style="font-size:12px;color:#5f5e5a"></span>
+  </div>
+  <div class="hp-grid">
+    <div class="hp-block">
+      <div class="hp-top"><span class="hp-nm" id="p-nm">你</span><span class="hp-val" id="p-hpv">100/100</span></div>
+      <div class="hpbar"><div class="hpbar-fill hpf-p" id="p-hpb" style="width:100%"></div></div>
+      <div class="stat-row" id="p-stats"></div>
+      <div class="buff-row" id="p-buffs"></div>
+    </div>
+    <div class="hp-block">
+      <div class="hp-top"><span class="hp-nm" id="e-nm">敵人</span><span class="hp-val" id="e-hpv">100/100</span></div>
+      <div class="hpbar"><div class="hpbar-fill hpf-e" id="e-hpb" style="width:100%"></div></div>
+      <div class="stat-row" id="e-stats"></div>
+      <div class="buff-row" id="e-buffs"></div>
+    </div>
+  </div>
+  <div class="log-box" id="log"></div>
+  <div id="panel-battle">
+    <div class="panel">
+      <div class="energy-bar">
+        <span style="font-size:12px;color:#5f5e5a">氣力</span>
+        <div id="e-dots"></div>
+        <span id="e-lbl" style="font-size:11px;color:#5f5e5a"></span>
+        <button class="end-btn" onclick="endTurn()">結束回合</button>
+      </div>
+      <div class="panel-lbl">手牌</div>
+      <div class="cards-row" id="hand-row"></div>
+    </div>
+  </div>
+  <div id="panel-equip" style="display:none">
+    <div class="panel">
+      <div class="panel-lbl">裝備欄（點擊裝備 / 卸下，同槽自動替換）</div>
+      <div class="equip-grid" id="equip-grid"></div>
+    </div>
+  </div>
+</div>
+<div id="scr-over" class="screen">
+  <div class="over-t" id="over-t">勝利</div>
+  <div class="over-s" id="over-s"></div>
+  <button class="go-btn" onclick="resetGame()">再戰江湖</button>
+</div>
+</div>
+
+<script>
+const SECTS=[
+  {id:'shaolin',name:'少林',icon:'⛩',flavor:'剛猛正道',atk:14,def:6,maxHp:115,
+   cards:[
+    {id:'sh1',name:'龍爪手',ty:'攻擊',ds:'造成 18 傷害',co:2,fn:g=>dmg(g,18)},
+    {id:'sh2',name:'鐵砂掌',ty:'攻擊',ds:'12 傷害 + 灼傷 3×3',co:2,fn:g=>{dmg(g,12);addBuff(g.en,'dot',3,3)}},
+    {id:'sh3',name:'金剛護體',ty:'防禦',ds:'獲得 14 護盾',co:1,fn:g=>shield(g.pl,14)},
+    {id:'sh4',name:'羅漢拳',ty:'攻擊',ds:'8 傷害 × 2',co:1,fn:g=>{dmg(g,8);dmg(g,8)}},
+    {id:'sh5',name:'禪定',ty:'技能',ds:'回復 18 氣血',co:1,fn:g=>heal(g.pl,18)},
+    {id:'sh6',name:'伏虎功',ty:'攻擊',ds:'造成 24 傷害',co:3,fn:g=>dmg(g,24)},
+    {id:'sh7',name:'達摩掌',ty:'攻擊',ds:'10 傷害，攻+4×2回',co:2,fn:g=>{dmg(g,10);addBuff(g.pl,'atk',4,2)}},
+    {id:'sh8',name:'韋陀降魔',ty:'攻擊',ds:'28 傷害，暈眩 1回',co:3,fn:g=>{dmg(g,28);addBuff(g.en,'stun',1,1)}},
+  ]},
+  {id:'wudang',name:'武當',icon:'☁',flavor:'以柔克剛',atk:11,def:9,maxHp:100,
+   cards:[
+    {id:'wu1',name:'太極推手',ty:'防禦',ds:'8 護盾 + 反彈 5 傷',co:1,fn:g=>{shield(g.pl,8);addBuff(g.en,'dot',5,1)}},
+    {id:'wu2',name:'劍氣縱橫',ty:'攻擊',ds:'造成 15 傷害',co:2,fn:g=>dmg(g,15)},
+    {id:'wu3',name:'綿掌功',ty:'技能',ds:'攻+4×3回',co:1,fn:g=>addBuff(g.pl,'atk',4,3)},
+    {id:'wu4',name:'淩波微步',ty:'技能',ds:'防+5×2回，抽1牌',co:1,fn:g=>{addBuff(g.pl,'def',5,2);draw(g,1)}},
+    {id:'wu5',name:'北斗七劍',ty:'攻擊',ds:'造成 22 傷害',co:3,fn:g=>dmg(g,22)},
+    {id:'wu6',name:'輕功',ty:'技能',ds:'抽 3 張牌',co:1,fn:g=>draw(g,3)},
+    {id:'wu7',name:'無極劍法',ty:'攻擊',ds:'13 傷害 × 2',co:3,fn:g=>{dmg(g,13);dmg(g,13)}},
+    {id:'wu8',name:'太極劍',ty:'攻擊',ds:'20 傷害，防+3×2回',co:2,fn:g=>{dmg(g,20);addBuff(g.pl,'def',3,2)}},
+  ]},
+  {id:'emei',name:'峨嵋',icon:'🌸',flavor:'慈悲療癒',atk:10,def:12,maxHp:105,
+   cards:[
+    {id:'em1',name:'峨嵋劍法',ty:'攻擊',ds:'造成 13 傷害',co:2,fn:g=>dmg(g,13)},
+    {id:'em2',name:'白蛇吐信',ty:'攻擊',ds:'8 傷害 + 中毒 3×4',co:1,fn:g=>{dmg(g,8);addBuff(g.en,'dot',3,4)}},
+    {id:'em3',name:'九陽真氣',ty:'技能',ds:'每回合回血 6×3回',co:2,fn:g=>addBuff(g.pl,'heal',6,3)},
+    {id:'em4',name:'鐵布衫',ty:'防禦',ds:'獲得 16 護盾',co:2,fn:g=>shield(g.pl,16)},
+    {id:'em5',name:'回春術',ty:'技能',ds:'回復 22 氣血',co:2,fn:g=>heal(g.pl,22)},
+    {id:'em6',name:'千手觀音',ty:'攻擊',ds:'造成 26 傷害',co:3,fn:g=>dmg(g,26)},
+    {id:'em7',name:'聖光護體',ty:'防禦',ds:'12 護盾 + 回血 10',co:2,fn:g=>{shield(g.pl,12);heal(g.pl,10)}},
+    {id:'em8',name:'蓮花掌',ty:'攻擊',ds:'10 傷害，回血 8',co:2,fn:g=>{dmg(g,10);heal(g.pl,8)}},
+  ]},
+  {id:'tangmen',name:'唐門',icon:'☆',flavor:'暗器毒術',atk:13,def:5,maxHp:95,
+   cards:[
+    {id:'ta1',name:'暗器飛鏢',ty:'攻擊',ds:'6 傷害 × 3',co:2,fn:g=>{dmg(g,6);dmg(g,6);dmg(g,6)}},
+    {id:'ta2',name:'劇毒',ty:'技能',ds:'敵人中毒 6×4回',co:2,fn:g=>addBuff(g.en,'dot',6,4)},
+    {id:'ta3',name:'奪命針',ty:'攻擊',ds:'造成 20 傷害',co:2,fn:g=>dmg(g,20)},
+    {id:'ta4',name:'煙霧彈',ty:'技能',ds:'敵人攻-5×2回',co:1,fn:g=>addBuff(g.en,'weakAtk',-5,2)},
+    {id:'ta5',name:'迴旋鏢',ty:'攻擊',ds:'14 傷害，抽1牌',co:2,fn:g=>{dmg(g,14);draw(g,1)}},
+    {id:'ta6',name:'連環暗器',ty:'攻擊',ds:'5 傷害 × 5',co:3,fn:g=>{for(let i=0;i<5;i++)dmg(g,5)}},
+    {id:'ta7',name:'七傷拳',ty:'攻擊',ds:'25 傷害，自損 5',co:3,fn:g=>{dmg(g,25);g.pl.hp-=5;log('自損 5 氣血')}},
+    {id:'ta8',name:'毒針護甲',ty:'防禦',ds:'10 護盾，攻+3×2回',co:1,fn:g=>{shield(g.pl,10);addBuff(g.pl,'atk',3,2)}},
+  ]},
+  {id:'xiaoyao',name:'逍遙',icon:'∞',flavor:'奇門異術',atk:12,def:8,maxHp:100,
+   cards:[
+    {id:'xy1',name:'北冥神功',ty:'技能',ds:'吸取敵人 15 氣血',co:2,fn:g=>{dmg(g,15);heal(g.pl,15)}},
+    {id:'xy2',name:'凌波微步',ty:'技能',ds:'抽 2 牌，攻+3×2回',co:1,fn:g=>{draw(g,2);addBuff(g.pl,'atk',3,2)}},
+    {id:'xy3',name:'天山折梅',ty:'攻擊',ds:'造成 17 傷害',co:2,fn:g=>dmg(g,17)},
+    {id:'xy4',name:'小無相功',ty:'技能',ds:'隨機複製一張手牌',co:1,fn:g=>{if(g.hand.length>0){const c={...g.hand[Math.floor(Math.random()*g.hand.length)]};g.hand.push(c);log('複製了 '+c.name)}}},
+    {id:'xy5',name:'八荒六合',ty:'攻擊',ds:'12 傷害 + 吸血',co:2,fn:g=>{dmg(g,12);addBuff(g.pl,'lifeSteal',5,2)}},
+    {id:'xy6',name:'化功大法',ty:'技能',ds:'清除自身負面狀態',co:1,fn:g=>{g.pl.buffs=g.pl.buffs.filter(b=>['atk','def','heal','lifeSteal'].includes(b.type));log('清除了負面狀態')}},
+    {id:'xy7',name:'天魔解體',ty:'攻擊',ds:'造成 30 傷害',co:3,fn:g=>dmg(g,30)},
+    {id:'xy8',name:'逍遙遊',ty:'防禦',ds:'12 護盾 + 抽1牌',co:2,fn:g=>{shield(g.pl,12);draw(g,1)}},
+  ]},
+  {id:'mojiao',name:'魔教',icon:'▲',flavor:'邪道霸主',atk:16,def:4,maxHp:90,
+   cards:[
+    {id:'mo1',name:'魔功',ty:'攻擊',ds:'造成 20 傷害',co:2,fn:g=>dmg(g,20)},
+    {id:'mo2',name:'血祭',ty:'技能',ds:'自損 15，攻+8×3回',co:1,fn:g=>{g.pl.hp-=15;addBuff(g.pl,'atk',8,3);log('血祭！自損 15，攻擊大增')}},
+    {id:'mo3',name:'吸魂大法',ty:'技能',ds:'吸取 20 氣血',co:2,fn:g=>{dmg(g,20);heal(g.pl,20)}},
+    {id:'mo4',name:'邪火',ty:'攻擊',ds:'灼傷 8×4回',co:2,fn:g=>addBuff(g.en,'dot',8,4)},
+    {id:'mo5',name:'滅世一擊',ty:'攻擊',ds:'造成 35 傷害',co:3,fn:g=>dmg(g,35)},
+    {id:'mo6',name:'魔障',ty:'防禦',ds:'18 護盾',co:2,fn:g=>shield(g.pl,18)},
+    {id:'mo7',name:'混沌拳',ty:'攻擊',ds:'10 傷害 × 3',co:3,fn:g=>{dmg(g,10);dmg(g,10);dmg(g,10)}},
+    {id:'mo8',name:'暗黑爆破',ty:'攻擊',ds:'25 傷害，暈眩 1回',co:3,fn:g=>{dmg(g,25);addBuff(g.en,'stun',1,1)}},
+  ]},
+];
+
+const EQUIPS=[
+  {id:'e1',nm:'普通長劍',ty:'武器',ds:'攻擊力 +3',rarity:'n',fn:p=>{p.atk+=3},unf:p=>{p.atk-=3}},
+  {id:'e2',nm:'精鐵大刀',ty:'武器',ds:'攻擊力 +6',rarity:'r',fn:p=>{p.atk+=6},unf:p=>{p.atk-=6}},
+  {id:'e3',nm:'龍泉寶劍',ty:'武器',ds:'攻擊力 +10',rarity:'e',fn:p=>{p.atk+=10},unf:p=>{p.atk-=10}},
+  {id:'e4',nm:'倚天劍',ty:'武器',ds:'攻擊力 +15',rarity:'l',fn:p=>{p.atk+=15},unf:p=>{p.atk-=15}},
+  {id:'e5',nm:'皮甲',ty:'護甲',ds:'防禦力 +3',rarity:'n',fn:p=>{p.def+=3},unf:p=>{p.def-=3}},
+  {id:'e6',nm:'鎖子甲',ty:'護甲',ds:'防禦力 +6',rarity:'r',fn:p=>{p.def+=6},unf:p=>{p.def-=6}},
+  {id:'e7',nm:'玄鐵重甲',ty:'護甲',ds:'防禦力 +10',rarity:'e',fn:p=>{p.def+=10},unf:p=>{p.def-=10}},
+  {id:'e8',nm:'龍鱗護甲',ty:'護甲',ds:'防禦力 +14',rarity:'l',fn:p=>{p.def+=14},unf:p=>{p.def-=14}},
+  {id:'e9',nm:'護身符',ty:'飾品',ds:'最大氣血 +20',rarity:'n',fn:p=>{p.maxHp+=20;p.hp+=20},unf:p=>{p.maxHp-=20;p.hp=Math.min(p.hp,p.maxHp)}},
+  {id:'e10',nm:'玉佩',ty:'飾品',ds:'最大氣血 +40',rarity:'r',fn:p=>{p.maxHp+=40;p.hp+=40},unf:p=>{p.maxHp-=40;p.hp=Math.min(p.hp,p.maxHp)}},
+  {id:'e11',nm:'九陽玉珠',ty:'飾品',ds:'最大氣血 +60',rarity:'e',fn:p=>{p.maxHp+=60;p.hp+=60},unf:p=>{p.maxHp-=60;p.hp=Math.min(p.hp,p.maxHp)}},
+  {id:'e12',nm:'乾坤戒',ty:'飾品',ds:'全屬性 +8，血量 +30',rarity:'l',fn:p=>{p.atk+=8;p.def+=8;p.maxHp+=30;p.hp+=30},unf:p=>{p.atk-=8;p.def-=8;p.maxHp-=30;p.hp=Math.min(p.hp,p.maxHp)}},
+];
+
+const ENEMIES=[
+  {nm:'流氓俠客',title:'江湖混混',atk:8,def:3,maxHp:65},
+  {nm:'黑風寨主',title:'山賊頭目',atk:11,def:5,maxHp:85},
+  {nm:'魔教長老',title:'邪道高手',atk:14,def:7,maxHp:105},
+  {nm:'天刀門主',title:'刀法宗師',atk:17,def:9,maxHp:125},
+  {nm:'武林盟主',title:'天下第一',atk:20,def:12,maxHp:155},
+];
+
+const ENEMY_AI=[
+  g=>{ const d=Math.max(0,(g.en.atk+sumBuff(g.en,'atk'))-(g.pl.def+sumBuff(g.pl,'def'))); let ab=Math.min(g.pl.shield||0,d); g.pl.shield=(g.pl.shield||0)-ab; g.pl.hp-=(d-ab); log(g.en.nm+' 猛攻！你受 '+(d-ab)+' 傷'+(ab?' ('+ab+'護盾吸收)':'')); },
+  g=>{ addBuff(g.en,'atk',4,2); log(g.en.nm+' 蓄力，攻擊大增！'); },
+  g=>{ shield(g.en,10); log(g.en.nm+' 防禦！獲得 10 護盾'); },
+  g=>{ addBuff(g.en,'dot',5,3); addBuff(g.pl,'dot',5,3); log(g.en.nm+' 釋放毒霧！你中毒了'); },
+];
+
+let G={}, selSect=null, equippedIds=new Set();
+
+function initSects(){
+  const el=document.getElementById('sect-grid'); el.innerHTML='';
+  SECTS.forEach(s=>{
+    const b=document.createElement('div'); b.className='sect-btn'; b.dataset.id=s.id;
+    b.innerHTML=`<div class="sect-icon">${s.icon}</div><div class="sect-nm">${s.name}派</div><div class="sect-fl">${s.flavor}</div><div class="sect-stat"><span class="spill">攻${s.atk}</span><span class="spill">防${s.def}</span><span class="spill">血${s.maxHp}</span></div>`;
+    b.onclick=()=>{ document.querySelectorAll('.sect-btn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); selSect=s; };
+    el.appendChild(b);
+  });
+  selSect=SECTS[0]; el.children[0].classList.add('sel');
+}
+
+function startGame(){
+  if(!selSect)return;
+  const s=selSect;
+  equippedIds=new Set();
+  G={round:1,energy:3,maxEnergy:3,eidx:0,
+    pl:{name:'你',sect:s.name,hp:s.maxHp,maxHp:s.maxHp,atk:s.atk,def:s.def,shield:0,buffs:[]},
+    en:{...ENEMIES[0],hp:ENEMIES[0].maxHp,shield:0,buffs:[]},
+    deck:[...s.cards,...s.cards],hand:[],discard:[],turn:true
+  };
+  shuffle(G.deck); draw(G,4);
+  document.getElementById('scr-start').style.display='none';
+  document.getElementById('scr-game').style.display='flex';
+  renderEquip(); renderGame();
+  log('戰鬥開始！對手：'+G.en.nm+'（'+G.en.title+'）');
+}
+
+function renderGame(){
+  const p=G.pl,e=G.en;
+  document.getElementById('round-lbl').textContent='第 '+G.round+' 回合';
+  document.getElementById('enemy-lbl').textContent=e.nm+' — '+e.title;
+  document.getElementById('p-nm').textContent=p.sect+'弟子';
+  document.getElementById('e-nm').textContent=e.nm;
+  document.getElementById('p-hpv').textContent=Math.max(0,p.hp)+'/'+p.maxHp;
+  document.getElementById('e-hpv').textContent=Math.max(0,e.hp)+'/'+e.maxHp;
+  document.getElementById('p-hpb').style.width=Math.max(0,p.hp/p.maxHp*100)+'%';
+  document.getElementById('e-hpb').style.width=Math.max(0,e.hp/e.maxHp*100)+'%';
+  const pa=p.atk+sumBuff(p,'atk'), pd=p.def+sumBuff(p,'def');
+  const ea=e.atk+sumBuff(e,'atk'), ed=e.def+sumBuff(e,'def');
+  document.getElementById('p-stats').innerHTML=`<span class="st-p">攻${pa}</span><span class="st-p">防${pd}</span>${p.shield?`<span class="st-p" style="color:#185FA5">盾${p.shield}</span>`:''}`;
+  document.getElementById('e-stats').innerHTML=`<span class="st-p">攻${ea}</span><span class="st-p">防${ed}</span>${e.shield?`<span class="st-p" style="color:#185FA5">盾${e.shield}</span>`:''}`;
+  renderBuffs('p-buffs',p.buffs);
+  renderBuffs('e-buffs',e.buffs);
+  renderEnergy(); renderHand();
+}
+
+function renderBuffs(id,buffs){
+  const el=document.getElementById(id); el.innerHTML='';
+  buffs.forEach(b=>{
+    const t=document.createElement('span'); t.className='bt bt-'+b.type;
+    const lbl={atk:'攻+',def:'防+',dot:'灼傷',heal:'回血+',stun:'暈眩',lifeSteal:'吸血+',weakAtk:'攻-'};
+    const val=b.type==='stun'?'':Math.abs(b.val);
+    t.textContent=(lbl[b.type]||b.type)+val+' ('+b.turns+')'; el.appendChild(t);
+  });
+}
+
+function renderEnergy(){
+  const el=document.getElementById('e-dots'); el.innerHTML='';
+  for(let i=0;i<G.maxEnergy;i++){const d=document.createElement('span');d.className='e-dot'+(i<G.energy?' on':'');el.appendChild(d);}
+  document.getElementById('e-lbl').textContent=G.energy+'/'+G.maxEnergy;
+}
+
+function renderHand(){
+  const row=document.getElementById('hand-row'); row.innerHTML='';
+  G.hand.forEach((c,i)=>{
+    const el=document.createElement('div'); el.className='card'+(c.co>G.energy?' dis':'');
+    el.innerHTML=`<div class="card-ty">${c.ty}</div><div class="card-nm">${c.name||c.nm}</div><div class="card-ds">${c.ds}</div><div class="card-co">氣力 ${c.co}</div>`;
+    if(c.co<=G.energy) el.onclick=()=>playCard(i);
+    row.appendChild(el);
+  });
+}
+
+function renderEquip(){
+  const grid=document.getElementById('equip-grid'); grid.innerHTML='';
+  const rareLbl={n:'普通',r:'稀有',e:'精良',l:'傳說'};
+  EQUIPS.forEach(eq=>{
+    const el=document.createElement('div'); el.className='eq-slot'+(equippedIds.has(eq.id)?' equipped':'');
+    el.innerHTML=`<div class="eq-ty">${eq.ty}</div><div class="eq-head"><div class="eq-nm">${eq.nm}</div><span class="eq-rarity rare-${eq.rarity}">${rareLbl[eq.rarity]}</span></div><div class="eq-ds">${eq.ds}</div>`;
+    el.onclick=()=>toggleEquip(eq);
+    grid.appendChild(el);
+  });
+}
+
+function toggleEquip(eq){
+  if(equippedIds.has(eq.id)){equippedIds.delete(eq.id);eq.unf(G.pl);log('卸下 '+eq.nm);}
+  else{
+    const sameType=[...equippedIds].map(id=>EQUIPS.find(e=>e.id===id)).filter(e=>e&&e.ty===eq.ty);
+    sameType.forEach(old=>{equippedIds.delete(old.id);old.unf(G.pl);});
+    equippedIds.add(eq.id);eq.fn(G.pl);log('裝備 '+eq.nm+'！'+eq.ds);
+  }
+  renderEquip(); renderGame();
+}
+
+function showTab(t){
+  document.getElementById('panel-battle').style.display=t==='battle'?'block':'none';
+  document.getElementById('panel-equip').style.display=t==='equip'?'block':'none';
+  document.getElementById('tab-battle').classList.toggle('active',t==='battle');
+  document.getElementById('tab-equip').classList.toggle('active',t==='equip');
+}
+
+function playCard(idx){
+  if(!G.turn)return;
+  const c=G.hand[idx]; if(c.co>G.energy)return;
+  G.energy-=c.co; G.hand.splice(idx,1); G.discard.push(c);
+  log('你出招：'+(c.name||c.nm)); c.fn(G);
+  if(checkDeath())return; renderGame();
+}
+
+function endTurn(){
+  if(!G.turn)return; G.turn=false;
+  tickBuffs(G.pl);
+  if(checkDeath())return;
+  setTimeout(()=>enemyTurn(),500);
+}
+
+function enemyTurn(){
+  if(G.en.buffs.find(b=>b.type==='stun')){log(G.en.nm+' 被暈眩，跳過行動！');}
+  else{ const ai=ENEMY_AI[Math.floor(Math.random()*ENEMY_AI.length)]; ai(G); }
+  tickBuffs(G.en);
+  if(checkDeath())return;
+  G.round++; G.energy=G.maxEnergy; G.turn=true;
+  draw(G,2); renderGame();
+}
+
+function checkDeath(){
+  if(G.pl.hp<=0){showOver(false);return true;}
+  if(G.en.hp<=0){
+    G.eidx++;
+    if(G.eidx>=ENEMIES.length){showOver(true,true);return true;}
+    log('✦ '+G.en.nm+' 敗北！下一個對手登場...');
+    G.en={...ENEMIES[G.eidx],hp:ENEMIES[G.eidx].maxHp,shield:0,buffs:[]};
+    G.round=1; G.energy=G.maxEnergy; G.turn=true;
+    G.pl.hp=Math.min(G.pl.maxHp,G.pl.hp+25);
+    draw(G,2); renderGame(); renderEquip();
+    return true;
+  }
+  return false;
+}
+
+function showOver(win,cleared){
+  document.getElementById('scr-game').style.display='none';
+  document.getElementById('scr-over').style.display='flex';
+  const t=document.getElementById('over-t'),s=document.getElementById('over-s');
+  if(cleared){t.textContent='武林稱霸';t.style.color='#1D9E75';s.textContent='你擊敗了五大強敵，成為新一代武林盟主！';}
+  else if(win){t.textContent='勝利';t.style.color='#1D9E75';s.textContent=G.en.nm+' 落敗！繼續前行...';}
+  else{t.textContent='落敗';t.style.color='#D85A30';s.textContent='你被 '+G.en.nm+' 擊倒，江湖路遠，再接再厲。';}
+}
+
+function resetGame(){
+  document.getElementById('scr-over').style.display='none';
+  document.getElementById('scr-start').style.display='flex';
+  document.getElementById('log').innerHTML='';
+  initSects();
+}
+
+function dmg(g,base){
+  const tot=base+sumBuff(g.pl,'atk')+sumBuff(g.pl,'weakAtk');
+  const red=Math.max(0,tot-(g.en.def+sumBuff(g.en,'def')+sumBuff(g.en,'weakAtk')));
+  let ab=Math.min(g.en.shield||0,red); g.en.shield=(g.en.shield||0)-ab; g.en.hp-=(red-ab);
+  log('造成 '+(red-ab)+' 傷害'+(ab?' ('+ab+'護盾吸收)':''));
+  if(sumBuff(g.pl,'lifeSteal')>0){heal(g.pl,sumBuff(g.pl,'lifeSteal'));}
+}
+function shield(unit,v){unit.shield=(unit.shield||0)+v;log((unit===G.pl?'你':'敵人')+' 獲得 '+v+' 護盾');}
+function heal(unit,v){unit.hp=Math.min(unit.maxHp,unit.hp+v);log((unit===G.pl?'你':'敵人')+' 回復 '+v+' 氣血');}
+function addBuff(unit,type,val,turns){
+  const ex=unit.buffs.find(b=>b.type===type);
+  if(ex){ex.val=val;ex.turns=Math.max(ex.turns,turns);}
+  else unit.buffs.push({type,val,turns});
+  const who=unit===G.pl?'你':'敵人';
+  const lbl={atk:'攻擊提升',def:'防禦提升',dot:'灼傷',heal:'每回合回血',stun:'暈眩',lifeSteal:'吸血',weakAtk:'攻擊削弱'};
+  log(who+(lbl[type]||type)+' '+Math.abs(val)+'，持續 '+turns+' 回');
+}
+function tickBuffs(unit){
+  unit.buffs=unit.buffs.map(b=>{
+    if(b.type==='dot'){unit.hp-=b.val;log((unit===G.pl?'你':'敵人')+' 受灼傷 '+b.val);}
+    if(b.type==='heal'){unit.hp=Math.min(unit.maxHp,unit.hp+b.val);log((unit===G.pl?'你':'敵人')+' 回血 '+b.val);}
+    return{...b,turns:b.turns-1};
+  }).filter(b=>b.turns>0);
+}
+function draw(g,n){
+  for(let i=0;i<n;i++){
+    if(g.deck.length===0){g.deck=[...g.discard];g.discard=[];shuffle(g.deck);}
+    if(g.deck.length>0&&g.hand.length<8)g.hand.push(g.deck.pop());
+  }
+}
+function sumBuff(unit,type){return unit.buffs.filter(b=>b.type===type).reduce((s,b)=>s+b.val,0);}
+function log(msg){const el=document.getElementById('log');const p=document.createElement('p');p.textContent=msg;el.appendChild(p);el.scrollTop=el.scrollHeight;}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+
+initSects();
+</script>
+</body>
+</html>
