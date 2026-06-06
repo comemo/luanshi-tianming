@@ -2,102 +2,222 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>亂世天命 v2.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>亂世殺局 Ultimate v0.2</title>
 <style>
-  :root{
-    --bg:#16100b;--panel:#2a1a10;--panel2:#3a2415;--gold:#f3c86a;--red:#c6382f;--green:#47b36b;--blue:#5aa3e6;--text:#fff7df;--muted:#c9b58b;--card:#f7e6bd;--ink:#2b160c;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(circle at top,#3a2415,#100b08 70%);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",Arial,sans-serif;color:var(--text);}
-  body{position:fixed;width:100%;height:100%;}
-  .game{height:100dvh;display:grid;grid-template-rows:18% 24% 18% 28% 12%;gap:6px;padding:8px;max-width:520px;margin:0 auto;}
-  .panel{border:1px solid rgba(243,200,106,.35);background:linear-gradient(180deg,rgba(58,36,21,.96),rgba(32,20,13,.96));border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.35);overflow:hidden;}
-  .fighter{display:grid;grid-template-columns:74px 1fr 72px;gap:8px;padding:8px;align-items:center;}
-  .portrait{height:100%;min-height:58px;border-radius:14px;background:linear-gradient(145deg,#5c3520,#1b1110);display:flex;align-items:center;justify-content:center;font-size:32px;border:1px solid rgba(243,200,106,.35);}
-  .name{font-weight:800;font-size:18px;color:var(--gold);line-height:1.1}.sub{font-size:12px;color:var(--muted);margin-top:3px}.hp{font-size:20px;letter-spacing:1px;margin-top:4px}.statbox{text-align:right;font-size:12px;color:var(--muted)}.tag{display:inline-block;padding:2px 6px;border-radius:999px;background:rgba(243,200,106,.14);border:1px solid rgba(243,200,106,.28);color:var(--gold);margin-top:3px;font-size:11px}
-  .battle{padding:8px;display:flex;flex-direction:column;}.turnbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.title{font-weight:900;color:var(--gold);font-size:15px}.log{flex:1;overflow:auto;background:rgba(0,0,0,.22);border-radius:12px;padding:8px;font-size:13px;line-height:1.45;color:#ffeec6}.log b{color:var(--gold)}
-  .hand{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:9px;scroll-snap-type:x mandatory;align-items:stretch}.card{min-width:96px;width:96px;height:100%;border-radius:14px;background:linear-gradient(180deg,#fff1c9,#dfb96b);color:var(--ink);padding:8px;border:2px solid #8a5a25;box-shadow:0 6px 0 #6e421d,0 8px 12px rgba(0,0,0,.35);scroll-snap-align:start;display:flex;flex-direction:column;justify-content:space-between}.card:active{transform:translateY(4px);box-shadow:0 2px 0 #6e421d}.ctype{font-size:11px;color:#6b3c18}.cname{font-weight:900;font-size:22px;text-align:center}.cdesc{font-size:11px;line-height:1.25}.attack{background:linear-gradient(180deg,#ffd6c9,#d77753)}.trick{background:linear-gradient(180deg,#d7ecff,#80b9e8)}.heal{background:linear-gradient(180deg,#d9ffd5,#82ce7a)}.equip{background:linear-gradient(180deg,#f5e0ff,#b98be0)}
-  .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:8px}.btn{border:0;border-radius:14px;font-weight:900;font-size:15px;color:#271306;background:linear-gradient(180deg,#ffd978,#bd812d);box-shadow:0 4px 0 #754814}.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #754814}.btn.secondary{background:linear-gradient(180deg,#e8e1d0,#a8987d)}.btn.danger{background:linear-gradient(180deg,#ff8e82,#b93a32);color:white}
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}.modal{max-width:460px;width:100%;border-radius:22px;background:linear-gradient(180deg,#3b2516,#1d120d);border:1px solid rgba(243,200,106,.5);padding:20px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.6)}.modal h1{margin:0;color:var(--gold);font-size:30px}.modal p{color:#ead6ad;line-height:1.5}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.selects{display:grid;gap:8px;margin-top:14px}.small{font-size:12px;color:var(--muted)}
-  @media (max-height:680px){.game{grid-template-rows:17% 23% 17% 31% 12%;gap:5px;padding:6px}.card{min-width:88px;width:88px;padding:7px}.cname{font-size:20px}.log{font-size:12px}.name{font-size:16px}.hp{font-size:17px}.btn{font-size:14px}.portrait{font-size:28px}}
+:root{
+  --bg:#101319;--panel:#202733;--panel2:#2b3443;--gold:#d6a84f;--red:#8e1515;--green:#2db36f;
+  --text:#f4efe7;--muted:#b8bdc7;--blue:#3e7ee8;--danger:#d94a4a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",Arial,sans-serif}
+.game{height:100dvh;display:grid;grid-template-rows:52px 185px 96px 118px 1fr 64px;gap:7px;padding:env(safe-area-inset-top) 10px env(safe-area-inset-bottom);max-width:520px;margin:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#7b1111,#b9862d);border-radius:0 0 16px 16px;padding:8px 12px}
+.title{font-weight:900;font-size:20px;letter-spacing:.5px}
+.badge{font-size:12px;background:#1119;padding:5px 8px;border-radius:999px}
+.table{display:grid;grid-template-rows:92px 86px;gap:7px}
+.enemy-main{display:flex;justify-content:center}
+.side-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hero{background:var(--panel);border:1px solid #ffffff18;border-radius:18px;padding:8px;position:relative;box-shadow:0 4px 12px #0005}
+.hero.dead{opacity:.4;filter:grayscale(1)}
+.role{position:absolute;top:7px;right:7px;font-size:11px;padding:3px 6px;border-radius:999px;background:#0008;color:#fff}
+.avatar{font-size:26px;line-height:1}
+.name{font-weight:900;font-size:18px;margin-top:2px}
+.sub{color:var(--muted);font-size:12px;margin-top:1px}
+.hp{font-size:16px;letter-spacing:1px;margin-top:3px}
+.handcount{position:absolute;bottom:7px;right:8px;color:#ddd;font-size:12px}
+.battle{background:#151922;border:1px solid #ffffff12;border-radius:16px;padding:8px;overflow:hidden}
+.battle-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.phase{color:var(--gold);font-weight:900}
+.log{font-size:13px;line-height:1.35;height:58px;overflow:auto;color:#e9e1d6}
+.player{background:linear-gradient(180deg,#293345,#1d2531);border:2px solid var(--gold);border-radius:18px;padding:10px;display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center}
+.player .avatar{font-size:38px}.skill{font-size:12px;color:#ffe0a0}.status{text-align:right;font-size:12px;color:#d7d7d7}
+.hand{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;padding:2px 1px 6px;align-items:stretch}
+.card{min-width:94px;max-width:94px;background:linear-gradient(180deg,#f5db9c,#c38a32);color:#261508;border:2px solid #fff5;border-radius:14px;padding:8px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 5px 10px #0008}
+.card .ct{font-weight:900;font-size:19px}.card .cd{font-size:11px;line-height:1.2}.card.attack{background:linear-gradient(180deg,#ffb0a0,#b63828);color:white}.card.def{background:linear-gradient(180deg,#b9d3ff,#376cc8);color:white}.card.heal{background:linear-gradient(180deg,#b7f7cf,#2c9b5b);color:white}.card.tactic{background:linear-gradient(180deg,#eac0ff,#7940a9);color:white}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+button{border:0;border-radius:14px;font-weight:900;font-size:15px;padding:10px;color:white;background:#3b4656}
+button.primary{background:var(--red)}button.gold{background:#b78328}button.green{background:var(--green)}
+.overlay{position:fixed;inset:0;background:#080a0ecc;display:flex;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal{background:#202733;border:1px solid #ffffff25;border-radius:22px;padding:18px;max-width:460px;width:100%;box-shadow:0 20px 60px #000}
+.modal h1{margin:0 0 8px;font-size:28px}.modal p{color:#d6d6d6;line-height:1.5}.pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.pick button{background:#2f3a4c;text-align:left}.hidden{display:none}
+.small{font-size:12px;color:#aaa}.win{color:#ffe69a}.lose{color:#ff9a9a}
 </style>
 </head>
 <body>
-<div class="game" id="game">
-  <section class="panel fighter" id="enemyBox"></section>
-  <section class="panel battle"><div class="turnbar"><div class="title" id="stageTitle">亂世天命 v2.0</div><div class="small" id="deckInfo"></div></div><div class="log" id="log"></div></section>
-  <section class="panel fighter" id="playerBox"></section>
-  <section class="panel hand" id="hand"></section>
-  <section class="actions"><button class="btn secondary" onclick="drawCard()">抽牌</button><button class="btn" onclick="endTurn()">結束回合</button><button class="btn danger" onclick="newGame(true)">重開</button></section>
-</div>
-<div class="overlay" id="start">
-  <div class="modal">
-    <h1>亂世天命</h1>
-    <p>單人三國卡牌小遊戲 v2.0<br>固定手機畫面，點擊手牌出牌，擊敗敵將即可過關。</p>
-    <div class="selects" id="charChoices"></div>
-    <button class="btn" style="width:100%;height:48px;margin-top:14px" onclick="startRun()">開始亂世</button>
-    <p class="small">提示：桃可補血；閃會在敵方攻擊時自動使用；裝備會提升傷害。</p>
+<div class="game">
+  <div class="topbar"><div class="title">亂世殺局 Ultimate</div><div class="badge" id="round">第 1 回合</div></div>
+  <div class="table">
+    <div class="enemy-main"><div class="hero" id="p1"></div></div>
+    <div class="side-row"><div class="hero" id="p2"></div><div class="hero" id="p3"></div></div>
+  </div>
+  <div class="battle">
+    <div class="battle-head"><div class="phase" id="phase">你的出牌階段</div><div class="small" id="identityTip"></div></div>
+    <div class="log" id="log"></div>
+  </div>
+  <div class="player" id="playerBox"></div>
+  <div class="hand" id="hand"></div>
+  <div class="actions">
+    <button class="gold" onclick="drawCard()">摸牌</button>
+    <button class="primary" onclick="endTurn()">結束回合</button>
+    <button class="green" onclick="newGame()">新局</button>
   </div>
 </div>
+
+<div class="overlay" id="start">
+  <div class="modal">
+    <h1>亂世殺局 Ultimate v0.2</h1>
+    <p>四人身份局原型：你會隨機成為君主、輔臣、叛軍或梟雄。每局武將、身份與局勢都不同。</p>
+    <div class="pick">
+      <button onclick="startGame()">開始亂世</button>
+      <button onclick="showRules()">規則簡介</button>
+    </div>
+    <div class="small">手機直向設計：武將、戰場、手牌全部固定在一屏內。</div>
+  </div>
+</div>
+
 <script>
-const heroes=[
- {n:'劉備',f:'蜀',hp:5,max:5,emoji:'🟢',skill:'仁德：每次使用桃額外+1血'},
- {n:'關羽',f:'蜀',hp:5,max:5,emoji:'🗡️',skill:'武聖：殺傷害+1'},
- {n:'張飛',f:'蜀',hp:6,max:6,emoji:'🐯',skill:'咆哮：每回合第一次殺後抽1'},
- {n:'趙雲',f:'蜀',hp:5,max:5,emoji:'🐉',skill:'龍膽：閃可當殺反擊'},
- {n:'諸葛亮',f:'蜀',hp:4,max:4,emoji:'🪭',skill:'觀星：每回合開始多抽1'},
- {n:'曹操',f:'魏',hp:5,max:5,emoji:'⚫',skill:'奸雄：受傷後抽1'},
- {n:'夏侯惇',f:'魏',hp:6,max:6,emoji:'🛡️',skill:'剛烈：受殺後反傷1'},
- {n:'郭嘉',f:'魏',hp:4,max:4,emoji:'📜',skill:'遺計：受傷後抽2'},
- {n:'孫權',f:'吳',hp:5,max:5,emoji:'🔵',skill:'制衡：每回合可棄1抽2'},
- {n:'周瑜',f:'吳',hp:4,max:4,emoji:'🔥',skill:'英姿：每回合多抽1'}
+const generals=[
+["劉備","蜀","🟢","仁德：回春額外+1"],["關羽","蜀","🧔","武聖：攻擊傷害+1"],["張飛","蜀","😠","咆哮：可連續攻擊"],["趙雲","蜀","🛡️","龍膽：受攻擊時有機會反擊"],
+["諸葛亮","蜀","🪶","觀星：每回合多摸1張"],["馬超","蜀","🐎","鐵騎：攻擊不可完全防禦"],["黃忠","蜀","🏹","烈弓：殘血時攻擊+1"],["姜維","蜀","📜","挑釁：敵人更易攻擊你"],
+["曹操","魏","👑","奸雄：受傷後摸1張"],["司馬懿","魏","🧠","鬼才：錦囊傷害+1"],["張遼","魏","⚔️","突襲：攻擊時棄敵手牌"],["夏侯惇","魏","🩸","剛烈：受傷反傷"],
+["郭嘉","魏","📘","遺計：受傷後摸2張"],["荀彧","魏","📚","王佐：可治療盟友"],["許褚","魏","💪","裸衣：攻擊高但易受傷"],["典韋","魏","🪓","惡來：瀕死時爆發"],
+["孫權","吳","🔵","制衡：可換手牌"],["周瑜","吳","🔥","英姿：每回合多摸1張"],["陸遜","吳","🌊","連營：空手牌時補牌"],["呂蒙","吳","🧩","克己：可蓄力"],
+["甘寧","吳","🏴","奇襲：破壞敵方防禦"],["孫尚香","吳","🌸","梟姬：裝備時摸牌"],["黃蓋","吳","🚢","苦肉：自傷換爆發"],["太史慈","吳","🎯","天義：攻擊命中率高"],
+["呂布","群","🐺","無雙：攻擊傷害+2"],["貂蟬","群","💃","離間：令敵方互鬥"],["董卓","群","🍖","暴虐：高血量低防禦"],["袁紹","群","🏯","亂箭：群體攻擊"],
+["張角","群","⚡","雷擊：錦囊爆發"],["華雄","群","🗡️","猛將：前期攻擊強"],["陳宮","群","🕯️","明策：強化盟友"],["高順","群","🚩","陷陣：攻擊穿透"]
 ];
-const enemies=[
- {n:'黃巾渠帥',hp:10,max:10,emoji:'🟡',ai:'普通'},
- {n:'董卓',hp:14,max:14,emoji:'🍖',ai:'暴虐'},
- {n:'呂布',hp:16,max:16,emoji:'🐺',ai:'猛攻'},
- {n:'袁紹',hp:18,max:18,emoji:'👑',ai:'名門'},
- {n:'司馬懿',hp:20,max:20,emoji:'♟️',ai:'深謀'}
+const roles=["君主","輔臣","叛軍","梟雄"];
+const deckBase=[
+{name:"攻擊",type:"attack",desc:"對一名敵人造成1傷害"},
+{name:"重擊",type:"attack",desc:"造成2傷害"},
+{name:"防禦",type:"def",desc:"抵消一次攻擊"},
+{name:"回春",type:"heal",desc:"回復1點體力"},
+{name:"火計",type:"tactic",desc:"造成2點計謀傷害"},
+{name:"破甲",type:"tactic",desc:"造成1傷害並棄敵一牌"},
+{name:"無中生有",type:"tactic",desc:"摸2張牌"},
+{name:"奇襲",type:"tactic",desc:"隨機攻擊一名敵人"}
 ];
-const baseDeck=[
- ['殺','attack','造成2點傷害'],['殺','attack','造成2點傷害'],['殺','attack','造成2點傷害'],['殺','attack','造成2點傷害'],
- ['閃','trick','自動抵擋敵方殺'],['閃','trick','自動抵擋敵方殺'],['桃','heal','回復2點體力'],['桃','heal','回復2點體力'],
- ['火攻','trick','造成3點傷害'],['決鬥','attack','雙方互傷2點'],['無中生有','trick','抽2張牌'],['順手牽羊','trick','偷看敵勢，造成1傷並抽1'],['過河拆橋','trick','敵方下回合傷害-1'],
- ['青龍刀','equip','裝備：殺傷害+1'],['赤兔馬','equip','裝備：受到傷害-1']
-];
-let S={};
-function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function hp(v,m){return '❤️'.repeat(Math.max(0,v))+'♡'.repeat(Math.max(0,m-v))}
-function log(t){S.log.unshift(t);S.log=S.log.slice(0,12);render()}
-function buildDeck(){let d=[];for(let i=0;i<3;i++)baseDeck.forEach(c=>d.push({name:c[0],type:c[1],desc:c[2],id:Math.random()}));return shuffle(d)}
-function newGame(reset=false){localStorage.removeItem('lst_v2');S={turn:1,stage:0,player:{...heroes[Math.floor(Math.random()*heroes.length)]},enemy:{...enemies[0]},deck:buildDeck(),hand:[],log:['<b>亂世開局。</b> 點擊手牌出牌。'],equip:{atk:0,def:0},enemyDebuff:0,actedKill:false};for(let i=0;i<4;i++)S.hand.push(S.deck.pop());document.getElementById('start').style.display='none';save();render()}
-function startRun(){newGame(true)}
-function save(){localStorage.setItem('lst_v2',JSON.stringify(S))}
-function load(){let x=localStorage.getItem('lst_v2');if(x){S=JSON.parse(x);document.getElementById('start').style.display='none';render()}else{showChoices();renderEmpty()}}
-function showChoices(){let box=document.getElementById('charChoices');let picks=shuffle([...heroes]).slice(0,3);box.innerHTML=picks.map((h,i)=>`<button class="btn secondary" onclick='chooseHero(${JSON.stringify(h)})'>${h.emoji} ${h.n}｜${h.f}｜${h.skill}</button>`).join('')}
-function chooseHero(h){S={turn:1,stage:0,player:{...h},enemy:{...enemies[0]},deck:buildDeck(),hand:[],log:[`<b>${h.n}</b> 起兵於亂世。`],equip:{atk:0,def:0},enemyDebuff:0,actedKill:false};for(let i=0;i<4;i++)S.hand.push(S.deck.pop());document.getElementById('start').style.display='none';save();render()}
-function renderEmpty(){document.getElementById('enemyBox').innerHTML='';document.getElementById('playerBox').innerHTML='';document.getElementById('hand').innerHTML='';document.getElementById('log').innerHTML='';}
-function fighterHTML(x,isEnemy){return `<div class="portrait">${x.emoji||'⚔️'}</div><div><div class="name">${x.n}</div><div class="sub">${isEnemy?'敵方｜'+x.ai:x.f+'｜'+x.skill}</div><div class="hp">${hp(x.hp,x.max)}</div></div><div class="statbox">${isEnemy?'關卡':'回合'}<br><b>${isEnemy?S.stage+1:S.turn}</b><br><span class="tag">手牌 ${isEnemy?'?':S.hand.length}</span></div>`}
-function render(){if(!S.player)return;document.getElementById('enemyBox').innerHTML=fighterHTML(S.enemy,true);document.getElementById('playerBox').innerHTML=fighterHTML(S.player,false);document.getElementById('stageTitle').textContent=`第 ${S.turn} 回合｜${S.player.n} 對 ${S.enemy.n}`;document.getElementById('deckInfo').textContent=`牌庫 ${S.deck.length}`;document.getElementById('log').innerHTML=S.log.join('<br>');document.getElementById('hand').innerHTML=S.hand.map((c,i)=>`<div class="card ${c.type}" onclick="play(${i})"><div class="ctype">${c.type==='attack'?'基本/攻擊':c.type==='heal'?'回復':c.type==='equip'?'裝備':'錦囊'}</div><div class="cname">${c.name}</div><div class="cdesc">${c.desc}</div></div>`).join('')}
-function drawCard(){if(S.deck.length<3)S.deck=buildDeck();S.hand.push(S.deck.pop());log('你抽了1張牌。');save()}
-function startTurnDraw(){let n=(['諸葛亮','周瑜'].includes(S.player.n)?3:2);for(let i=0;i<n;i++){if(!S.deck.length)S.deck=buildDeck();S.hand.push(S.deck.pop())}S.actedKill=false;log(`回合開始，你抽了${n}張牌。`)}
-function damage(target,amt,src=''){if(target==='enemy'){S.enemy.hp-=amt;log(`${src}敵方受到 <b>${amt}</b> 點傷害。`);if(S.enemy.hp<=0)winStage()}else{let real=Math.max(0,amt-S.equip.def);S.player.hp-=real;log(`${src}你受到 <b>${real}</b> 點傷害。`);if(['曹操','郭嘉'].includes(S.player.n)&&real>0){let n=S.player.n==='郭嘉'?2:1;for(let i=0;i<n;i++)S.hand.push(S.deck.pop());log(`${S.player.skill}，你抽${n}張。`)}if(S.player.hp<=0)gameOver()}}
-function healPlayer(n){let extra=S.player.n==='劉備'?1:0;S.player.hp=Math.min(S.player.max,S.player.hp+n+extra);log(`你回復 <b>${n+extra}</b> 點體力。`)}
-function play(i){let c=S.hand.splice(i,1)[0];if(!c)return;let bonus=(S.player.n==='關羽'&&c.name==='殺')?1:0;if(c.name==='殺'){damage('enemy',2+S.equip.atk+bonus,`${S.player.n} 使用【殺】，`);if(S.player.n==='張飛'&&!S.actedKill){S.hand.push(S.deck.pop());log('張飛【咆哮】觸發，抽1張。')}S.actedKill=true}
-else if(c.name==='桃')healPlayer(2);else if(c.name==='火攻')damage('enemy',3,`你使用【火攻】，`);else if(c.name==='決鬥'){damage('enemy',2,'【決鬥】'); if(S.enemy.hp>0)damage('player',2,'【決鬥】')}
-else if(c.name==='無中生有'){S.hand.push(S.deck.pop(),S.deck.pop());log('你使用【無中生有】，抽2張。')}
-else if(c.name==='順手牽羊'){damage('enemy',1,'你使用【順手牽羊】，');S.hand.push(S.deck.pop())}
-else if(c.name==='過河拆橋'){S.enemyDebuff=1;log('你使用【過河拆橋】，敵方下次傷害 -1。')}
-else if(c.name==='青龍刀'){S.equip.atk=1;log('你裝備【青龍偃月刀】：殺傷害 +1。')}
-else if(c.name==='赤兔馬'){S.equip.def=1;log('你裝備【赤兔馬】：受到傷害 -1。')}
-else if(c.name==='閃'){log('【閃】會在敵方攻擊時自動使用。') ; S.hand.push(c)}
-save();render()}
-function enemyTurn(){if(S.enemy.hp<=0||S.player.hp<=0)return;let dmg=2+Math.floor(S.stage/2);if(S.enemy.ai==='猛攻')dmg++;if(S.enemyDebuff){dmg--;S.enemyDebuff=0}let si=S.hand.findIndex(c=>c.name==='閃');if(si>=0){S.hand.splice(si,1);log(`敵方攻擊，你自動使用【閃】避開。`);if(S.player.n==='趙雲'){damage('enemy',1,'趙雲【龍膽】反擊，')}}else{damage('player',Math.max(1,dmg),`${S.enemy.n} 發動攻勢，`)}if(S.enemy.ai==='暴虐'&&Math.random()<.35){S.enemy.hp=Math.min(S.enemy.max,S.enemy.hp+1);log('董卓暴虐續命，回復1血。')}save();render()}
-function endTurn(){log('你結束回合。');enemyTurn();if(S.player.hp>0&&S.enemy.hp>0){S.turn++;startTurnDraw()}save();render()}
-function winStage(){S.stage++;if(S.stage>=enemies.length){S.log.unshift('<b>天下歸一！你完成亂世天命！</b>');save();setTimeout(()=>alert('勝利！你已統一天下。'),100);return}S.enemy={...enemies[S.stage]};S.enemy.hp=S.enemy.max;S.turn++;S.player.hp=Math.min(S.player.max,S.player.hp+2);S.hand.push(S.deck.pop(),S.deck.pop());S.log.unshift(`<b>你擊敗敵將！下一關：${S.enemy.n}</b>`)}
-function gameOver(){S.log.unshift('<b>兵敗如山倒。請重開再戰。</b>');save();setTimeout(()=>alert('失敗。亂世未定，再來一局！'),100)}
-load();
+let players=[],me=0,hand=[],round=1,gameOver=false;
+
+function rnd(n){return Math.floor(Math.random()*n)}
+function sample(arr){return arr[rnd(arr.length)]}
+function makePlayer(i,role){
+ let g=sample(generals);
+ let hp=role==="君主"?5:4;
+ return {i,role,name:g[0],faction:g[1],icon:g[2],skill:g[3],hp,max:hp,cards:3,alive:true};
+}
+function log(t){const el=document.getElementById("log");el.innerHTML="• "+t+"<br>"+el.innerHTML}
+function startGame(){
+ document.getElementById("start").classList.add("hidden");
+ newGame();
+}
+function showRules(){
+ alert("身份勝利：君主/輔臣要消滅叛軍與梟雄；叛軍要擊敗君主；梟雄要成為最後生還者。點手牌即可使用，攻擊會自動選擇敵對目標。");
+}
+function newGame(){
+ gameOver=false;round=1;hand=[];
+ let shuffled=[...roles].sort(()=>Math.random()-0.5);
+ players=[0,1,2,3].map(i=>makePlayer(i,shuffled[i]));
+ for(let i=0;i<4;i++)drawCard(false);
+ log("新局開始：你是「"+players[me].role+"」，武將為「"+players[me].name+"」。");
+ render();
+}
+function drawCard(show=true){
+ if(gameOver)return;
+ let c=sample(deckBase);hand.push({...c});
+ if(players[me].name==="諸葛亮"||players[me].name==="周瑜"){ if(Math.random()<.35) hand.push({...sample(deckBase)}); }
+ if(show)log("你摸到【"+c.name+"】。");
+ render();
+}
+function isEnemy(a,b){
+ if(!a.alive||!b.alive)return false;
+ if(a.role==="君主"||a.role==="輔臣")return b.role==="叛軍"||b.role==="梟雄";
+ if(a.role==="叛軍")return b.role==="君主"||b.role==="輔臣";
+ if(a.role==="梟雄")return true;
+}
+function targetsFor(p){return players.filter(x=>x.i!==p.i&&isEnemy(p,x)&&x.alive)}
+function chooseTarget(p){let ts=targetsFor(p); if(!ts.length)ts=players.filter(x=>x.i!==p.i&&x.alive); return ts[rnd(ts.length)]}
+function damage(target,amount,source){
+ if(!target||!target.alive)return;
+ target.hp-=amount;
+ log((source?source.name:"你")+" 對 "+target.name+" 造成 "+amount+" 傷害。");
+ if(target.name==="曹操"||target.name==="郭嘉"){target.cards++;log(target.name+" 發動受傷摸牌。")}
+ if(target.name==="夏侯惇"&&source&&source.alive){source.hp-=1;log(target.name+" 剛烈反傷 "+source.name+"。")}
+ if(target.hp<=0){target.alive=false;target.hp=0;log("【"+target.name+"】退場。");}
+ checkWin();
+}
+function playCard(idx){
+ if(gameOver)return;
+ let c=hand[idx]; let p=players[me]; let t=chooseTarget(p);
+ if(c.type==="attack"){
+   let dmg=c.name==="重擊"?2:1;
+   if(p.name==="關羽")dmg++;
+   if(p.name==="呂布")dmg+=2;
+   damage(t,dmg,p);
+ }
+ if(c.type==="heal"){
+   let heal=p.name==="劉備"?2:1;
+   p.hp=Math.min(p.max,p.hp+heal);log("你使用【回春】，回復 "+heal+" 點。");
+ }
+ if(c.name==="火計"){
+   let dmg=p.name==="司馬懿"||p.name==="張角"?3:2;damage(t,dmg,p);
+ }
+ if(c.name==="破甲"){
+   damage(t,1,p); if(t.cards>0)t.cards--; log(t.name+" 被棄置1張牌。");
+ }
+ if(c.name==="無中生有"){drawCard(false);drawCard(false);log("你使用【無中生有】，摸2張。");}
+ if(c.name==="奇襲"){damage(t,1,p);}
+ hand.splice(idx,1);render();
+}
+function aiAct(ai){
+ if(!ai.alive)return;
+ if(ai.hp<=2&&Math.random()<.45){ai.hp=Math.min(ai.max,ai.hp+1);log(ai.name+" 使用回春。");return;}
+ let t=chooseTarget(ai); if(!t)return;
+ let dmg=1;
+ if(ai.name==="呂布")dmg=2;
+ if(ai.name==="袁紹"&&Math.random()<.35){
+   log(ai.name+" 發動亂箭。");
+   players.forEach(x=>{if(x.i!==ai.i&&x.alive)damage(x,1,ai)});
+   return;
+ }
+ damage(t,dmg,ai);
+}
+function endTurn(){
+ if(gameOver)return;
+ document.getElementById("phase").textContent="敵方行動中";
+ for(let i=1;i<4;i++)aiAct(players[i]);
+ round++; drawCard(false); drawCard(false);
+ log("進入第 "+round+" 回合。");
+ document.getElementById("phase").textContent="你的出牌階段";
+ render();
+}
+function checkWin(){
+ let p=players[me];
+ if(!p.alive){gameOver=true;log("<span class='lose'>你已退場，亂世無情。</span>");}
+ let alive=players.filter(x=>x.alive);
+ let lord=players.find(x=>x.role==="君主");
+ if(lord&&!lord.alive){
+   if(p.role==="叛軍"){gameOver=true;log("<span class='win'>叛軍勝利！</span>");}
+   else if(p.role==="梟雄"&&alive.length===1&&alive[0].i===me){gameOver=true;log("<span class='win'>梟雄獨勝！</span>");}
+   else {gameOver=true;log("<span class='lose'>君主敗亡，天下崩裂。</span>");}
+ }
+ let bad=players.filter(x=>x.alive&&(x.role==="叛軍"||x.role==="梟雄"));
+ if(bad.length===0 && (p.role==="君主"||p.role==="輔臣")){gameOver=true;log("<span class='win'>王道勝利！</span>");}
+}
+function heroHTML(p,main=false){
+ let hearts="❤️".repeat(p.hp)+"🖤".repeat(Math.max(0,p.max-p.hp));
+ return `<div class="role">${p.role}</div><div class="avatar">${p.icon}</div><div class="name">${p.name}</div><div class="sub">${p.faction}｜${p.skill.split("：")[0]}</div><div class="hp">${hearts}</div><div class="handcount">手牌 ${p.cards}</div>`;
+}
+function render(){
+ document.getElementById("round").textContent="第 "+round+" 回合";
+ for(let i=1;i<4;i++){let el=document.getElementById("p"+i);el.innerHTML=heroHTML(players[i]);el.className="hero"+(players[i].alive?"":" dead");}
+ let p=players[me];document.getElementById("playerBox").innerHTML=`<div class="avatar">${p.icon}</div><div><div class="name">你：${p.name}</div><div class="sub">${p.faction}｜身份：${p.role}</div><div class="skill">【${p.skill}】</div></div><div class="status"><div>${"❤️".repeat(p.hp)}</div><div>手牌 ${hand.length}</div></div>`;
+ document.getElementById("identityTip").textContent="目標："+(p.role==="君主"||p.role==="輔臣"?"清除叛軍與梟雄":p.role==="叛軍"?"擊敗君主":"最後存活");
+ let h=document.getElementById("hand");h.innerHTML="";
+ hand.forEach((c,i)=>{let b=document.createElement("div");b.className="card "+(c.type==="attack"?"attack":c.type==="def"?"def":c.type==="heal"?"heal":"tactic");b.onclick=()=>playCard(i);b.innerHTML=`<div class="ct">${c.name}</div><div class="cd">${c.desc}</div>`;h.appendChild(b);});
+}
 </script>
 </body>
 </html>
